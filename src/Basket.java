@@ -1,8 +1,7 @@
 import java.io.*;
-import java.util.Collections;
-import java.util.Scanner;
+import java.io.ObjectOutputStream;
 
-public class Basket {
+public class Basket implements Serializable {
     protected int[] price;
     protected String[] products;
     protected int[] purchases;
@@ -37,33 +36,30 @@ public class Basket {
         System.out.println("Итого: " + sum + " руб");
     }
 
-    public void saveTxt(File textFile) {
-        String data = "";
-        try (PrintWriter out = new PrintWriter(textFile)) {
-            for (int i = 0; i < products.length; i++) {
-                data += purchases[i] + " ";
-            }
-            out.println(data);
+    public void saveBin(File file, Basket basket) {
+
+        try (
+                ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
+        ) {
+            out.writeObject(basket);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static Basket loadFromTxtFile(File textFile) {
+    static Basket loadFromBinFile(File file) {
         int[] p = {0, 0, 0};
         String[] products = new String[3];
-
-        if (!textFile.exists()) {
+        if (!file.exists()) {
             return new Basket(p, products, p);
         }
-        try (InputStream in = new FileInputStream(textFile)) {
-            Scanner scanner = new Scanner(in);
-            String[] data = scanner.nextLine().trim().split(" ");
-            for (int i = 0; i < 3; i++) {
-                p[i] = Integer.parseInt(data[i]);
-            }
-            return new Basket(p, products, p);
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            return (Basket) in.readObject();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return new Basket(p, products, p);

@@ -4,13 +4,16 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        File file = new File("basket.txt");
+        File file = new File("basket.bin");
         String[] products = {"Хлеб", "Яблоки", "Молоко"};
         int[] price = {100, 200, 300};
         int[] p = {0, 0, 0};
-        Basket basket = new Basket(price, products, p);
-        Basket b = Basket.loadFromTxtFile(file);
-        basket.setPurchases(b.getPurchases());
+        Basket basket=new Basket(price,products,p);
+        if (file.exists()) {
+            Basket b = Basket.loadFromBinFile(file);
+            basket.setPurchases(b.getPurchases());
+        }
+
         System.out.println("Список возможных товаров для покупки");
         for (int i = 0; i < price.length; i++) {
             System.out.println(i + 1 + ". " + products[i] + " " + price[i] + "руб/шт");
@@ -43,7 +46,7 @@ public class Main {
                 continue;
             }
             basket.addToCart(productNumber - 1, productCount);
-            basket.saveTxt(file);
+            basket.saveBin(file, basket);
         }
         basket.printCart();
     }
