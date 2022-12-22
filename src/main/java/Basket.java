@@ -1,5 +1,10 @@
+import netscape.javascript.JSException;
+import netscape.javascript.JSObject;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.io.*;
-import java.util.Collections;
 import java.util.Scanner;
 
 public class Basket {
@@ -38,34 +43,40 @@ public class Basket {
     }
 
     public void saveTxt(File textFile) {
-        String data = "";
-        try (PrintWriter out = new PrintWriter(textFile)) {
+        JSONObject obj = new JSONObject();
+        try (FileWriter out = new FileWriter(textFile)) {
             for (int i = 0; i < products.length; i++) {
-                data += purchases[i] + " ";
+                obj.put(products[i], purchases[i]);
             }
-            out.println(data);
+            out.write(obj.toJSONString());
+            out.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public static Basket loadFromTxtFile(File textFile) {
+        int[] pu = {0, 0, 0};
         int[] p = {0, 0, 0};
         String[] products = new String[3];
-
+        JSONParser parser = new JSONParser();
         if (!textFile.exists()) {
             return new Basket(p, products, p);
         }
-        try (InputStream in = new FileInputStream(textFile)) {
-            Scanner scanner = new Scanner(in);
-            String[] data = scanner.nextLine().trim().split(" ");
-            for (int i = 0; i < 3; i++) {
-                p[i] = Integer.parseInt(data[i]);
+        //       try (InputStream in = new FileInputStream(textFile)) {
+        try {
+            Object obj = parser.parse(new FileReader(textFile));
+            String st = obj.toString().substring(1, obj.toString().length() - 1);
+            String[] s = st.split(",");
+            int i = 0;
+            for (String a : s) {
+                String[] c = a.split(":");
+                p[i] = Integer.parseInt(c[1]);
+                i++;
             }
-            return new Basket(p, products, p);
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-        return new Basket(p, products, p);
+        return new Basket(pu, products, p);
     }
 }

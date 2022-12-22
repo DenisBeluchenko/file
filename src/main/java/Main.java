@@ -3,13 +3,15 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        ClientLog client=new ClientLog();
         Scanner scanner = new Scanner(System.in);
-        File file = new File("basket.txt");
+        File fileCSV = new File("log.csv");
+        File fileJson=new File("basket.json");
         String[] products = {"Хлеб", "Яблоки", "Молоко"};
         int[] price = {100, 200, 300};
         int[] p = {0, 0, 0};
         Basket basket = new Basket(price, products, p);
-        Basket b = Basket.loadFromTxtFile(file);
+        Basket b = Basket.loadFromTxtFile(fileJson);
         basket.setPurchases(b.getPurchases());
         System.out.println("Список возможных товаров для покупки");
         for (int i = 0; i < price.length; i++) {
@@ -43,8 +45,10 @@ public class Main {
                 continue;
             }
             basket.addToCart(productNumber - 1, productCount);
-            basket.saveTxt(file);
+            client.log(productNumber, productCount);
         }
+        client.exportAsCSV(fileCSV);
+        basket.saveTxt(fileJson);
         basket.printCart();
     }
 }
