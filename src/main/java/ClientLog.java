@@ -10,9 +10,6 @@ import java.util.StringJoiner;
 public class ClientLog {
     private List<String> logs = new ArrayList<String>();
 
-    public ClientLog() {
-    }
-
     public void log(int productNum, int amount) {
         logs.add(productNum + "," + amount);
     }

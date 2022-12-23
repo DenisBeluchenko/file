@@ -1,18 +1,26 @@
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        ClientLog client=new ClientLog();
+    public static void main(String[] args) throws ParserConfigurationException, IOException, SAXException {
+        ClientLog client = new ClientLog();
+        Config config = new Config();
         Scanner scanner = new Scanner(System.in);
-        File fileCSV = new File("log.csv");
-        File fileJson=new File("basket.json");
         String[] products = {"Хлеб", "Яблоки", "Молоко"};
         int[] price = {100, 200, 300};
         int[] p = {0, 0, 0};
         Basket basket = new Basket(price, products, p);
-//        Basket b = Basket.loadFromTxtFile(fileJson);
-//        basket.setPurchases(b.getPurchases());
+        if (config.isLoad()) {
+            if (config.getLoadType().equals("json")) {
+                basket.setPurchases(Basket.loadJson(new File(config.getLoadFileName())).getPurchases());
+            } else {
+                basket.setPurchases(Basket.loadFromTxtFile(new File(config.getLoadFileName())).getPurchases());
+            }
+        }
         System.out.println("Список возможных товаров для покупки");
         for (int i = 0; i < price.length; i++) {
             System.out.println(i + 1 + ". " + products[i] + " " + price[i] + "руб/шт");
@@ -46,9 +54,17 @@ public class Main {
             }
             basket.addToCart(productNumber - 1, productCount);
             client.log(productNumber, productCount);
+            if (config.isSave()) {
+                if (config.getSaveType().equals("json")) {
+                    basket.saveJson(new File(config.getSaveFileName()));
+                } else {
+                    basket.saveTxt(new File(config.getSaveFileName()));
+                }
+            }
         }
-        client.exportAsCSV(fileCSV);
-     //   basket.saveTxt(fileJson);
+        if (config.isLog()) {
+            client.exportAsCSV(new File(config.getLogFileName()));
+        }
         basket.printCart();
     }
 }
