@@ -11,8 +11,8 @@ public class Main {
         int[] price = {100, 200, 300};
         int[] p = {0, 0, 0};
         Basket basket = new Basket(price, products, p);
-        Basket b = Basket.loadFromTxtFile(fileJson);
-        basket.setPurchases(b.getPurchases());
+//        Basket b = Basket.loadFromTxtFile(fileJson);
+//        basket.setPurchases(b.getPurchases());
         System.out.println("Список возможных товаров для покупки");
         for (int i = 0; i < price.length; i++) {
             System.out.println(i + 1 + ". " + products[i] + " " + price[i] + "руб/шт");
@@ -48,7 +48,7 @@ public class Main {
             client.log(productNumber, productCount);
         }
         client.exportAsCSV(fileCSV);
-        basket.saveTxt(fileJson);
+     //   basket.saveTxt(fileJson);
         basket.printCart();
     }
 }

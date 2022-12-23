@@ -42,7 +42,7 @@ public class Basket {
         System.out.println("Итого: " + sum + " руб");
     }
 
-    public void saveTxt(File textFile) {
+    public void saveJson(File textFile) {
         JSONObject obj = new JSONObject();
         try (FileWriter out = new FileWriter(textFile)) {
             for (int i = 0; i < products.length; i++) {
@@ -55,7 +55,7 @@ public class Basket {
         }
     }
 
-    public static Basket loadFromTxtFile(File textFile) {
+    public static Basket loadJson(File textFile) {
         int[] pu = {0, 0, 0};
         int[] p = {0, 0, 0};
         String[] products = new String[3];
@@ -78,5 +78,36 @@ public class Basket {
             e.printStackTrace();
         }
         return new Basket(pu, products, p);
+    }
+    public void saveTxt(File textFile) {
+        String data = "";
+        try (PrintWriter out = new PrintWriter(textFile)) {
+            for (int i = 0; i < products.length; i++) {
+                data += purchases[i] + " ";
+            }
+            out.println(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Basket loadFromTxtFile(File textFile) {
+        int[] p = {0, 0, 0};
+        String[] products = new String[3];
+
+        if (!textFile.exists()) {
+            return new Basket(p, products, p);
+        }
+        try (InputStream in = new FileInputStream(textFile)) {
+            Scanner scanner = new Scanner(in);
+            String[] data = scanner.nextLine().trim().split(" ");
+            for (int i = 0; i < 3; i++) {
+                p[i] = Integer.parseInt(data[i]);
+            }
+            return new Basket(p, products, p);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new Basket(p, products, p);
     }
 }
